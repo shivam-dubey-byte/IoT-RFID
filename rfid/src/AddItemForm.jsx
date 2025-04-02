@@ -1,46 +1,49 @@
 import { useState } from "react";
 
 const AddItemForm = () => {
-    const [inputValue, setInputValue] = useState("");
+    const [name, setName] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!inputValue.trim()) {
-            alert("Please enter a value!");
+        if (!name.trim()) {
+            alert("Please enter a name!");
             return;
         }
 
         try {
             const response = await fetch("https://rfid.shivamrajdubey.tech/stock", {
-                method: "POST",
+                method: "GET", // GET request as required
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ id: inputValue }),
             });
+
+            // Check if the response is JSON
+            const contentType = response.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                throw new Error("Server returned non-JSON response (possible HTML error)");
+            }
 
             const data = await response.json();
             console.log("Response:", data);
-            alert(data.status || "Success!");
 
-            // Clear input after submission
-            setInputValue("");
+            alert(`Data received: ${JSON.stringify(data)}`);
         } catch (error) {
             console.error("Error:", error);
-            alert("Failed to send data.");
+            alert("Failed to fetch data. Check API URL or Server Logs.");
         }
     };
 
     return (
         <div style={{ textAlign: "center", marginTop: "20px" }}>
-            <h2>Add ID</h2>
+            <h2>Add Name</h2>
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    placeholder="Enter ID"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Enter Name"
                     style={{
                         padding: "8px",
                         fontSize: "16px",
