@@ -7,7 +7,7 @@ const {handleRfid, handleTempToStock
 
 
 // ActiveRequest Routes
-router.get("/sold",  handleRfid);
+router.post("/sold",  handleRfid);
 router.get("/stock",  handleTempToStock);
 
 module.exports = router;
