@@ -1,4 +1,5 @@
 import { useState } from "react";
+//import "./AddItemForm.css";
 
 const AddItemForm = () => {
     const [name, setName] = useState("");
@@ -12,12 +13,12 @@ const AddItemForm = () => {
         }
 
         try {
-            const response = await fetch("http://localhost:5010/api/stock", {//"https://rfid.shivamrajdubey.tech/api/stock"
+            const response = await fetch("https://rfid.shivamrajdubey.tech/api/stock", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ name }), // Send name in the request body
+                body: JSON.stringify({ name }),
             });
 
             const contentType = response.headers.get("content-type");

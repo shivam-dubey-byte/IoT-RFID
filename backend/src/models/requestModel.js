@@ -46,5 +46,27 @@ const processTempToStock = async (name) => {
     
     return { status: "Moved to STOCK", id, name };
 };
+// 📌 Add this at the end of requestModel.js
+const getStockItems = async () => {
+    const client = await connectDB();
+    const db = client.db("iot");
+    const stockCollection = db.collection("STOCK");
+    const items = await stockCollection.find().toArray();
+    return items;
+};
 
-module.exports = { processRfid, processTempToStock };
+const getSoldItems = async () => {
+    const client = await connectDB();
+    const db = client.db("iot");
+    const soldCollection = db.collection("SOLD");
+    const items = await soldCollection.find().toArray();
+    return items;
+};
+
+module.exports = {
+    processRfid,
+    processTempToStock,
+    getStockItems,
+    getSoldItems
+};
+

@@ -1,4 +1,4 @@
-const { processRfid, processTempToStock } = require("../models/requestModel.js");
+const { processRfid, processTempToStock, getStockItems, getSoldItems } = require("../models/requestModel");
 
 // Handle RFID Processing
 const handleRfid = async (req, res) => {
@@ -32,4 +32,29 @@ const handleTempToStock = async (req, res) => {
     }
 };
 
-module.exports = { handleRfid, handleTempToStock };
+
+const fetchStock = async (req, res) => {
+    try {
+        const items = await getStockItems();
+        res.status(200).json(items);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch stock items" });
+    }
+};
+
+const fetchSold = async (req, res) => {
+    try {
+        const items = await getSoldItems();
+        res.status(200).json(items);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch sold items" });
+    }
+};
+
+module.exports = {
+    handleRfid,
+    handleTempToStock,
+    fetchStock,
+    fetchSold
+};
+
