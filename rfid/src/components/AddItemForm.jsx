@@ -8,38 +8,30 @@ const AddItemForm = ({ onDataUpdated }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (!name.trim()) {
-            setStatus("Please enter a name.");
-            return;
-        }
+        if (!name.trim()) return setStatus("Please enter a name!");
 
         setLoading(true);
         setStatus("");
 
         try {
-            const response = await fetch("https://rfid.shivamrajdubey.tech/api/stock", {//http://localhost:5010/api/stock
+            const response = await fetch("https://rfid.shivamrajdubey.tech/api/stock", {//http://localhost:5000/api/stock
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name }),
             });
 
-            const contentType = response.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                throw new Error("Non-JSON response from server");
-            }
-
             const data = await response.json();
-            console.log("Response:", data);
 
-            setStatus("✅ Successfully sent: " + data.status);
-            setName("");
-            onDataUpdated(); // Trigger reload
+            if (data.status === "No ID in TEMP") {
+                setStatus("⚠️ No ID available in TEMP. Please scan an RFID first.");
+            } else {
+                setStatus("✅ " + data.status);
+                setName("");
+                onDataUpdated();
+                setTimeout(() => setStatus(""), 5000); // Hide after 5 sec
+            }
         } catch (error) {
-            console.error("❌ Error:", error);
-            setStatus("❌ Failed to send. Check API or server logs.");
+            setStatus("❌ Failed to send");
         } finally {
             setLoading(false);
         }
