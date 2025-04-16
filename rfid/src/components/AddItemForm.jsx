@@ -1,19 +1,24 @@
 import { useState } from "react";
-//import "./AddItemForm.css";
+import "./AddItemForm.css";
 
-const AddItemForm = () => {
+const AddItemForm = ({ onDataUpdated }) => {
     const [name, setName] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [status, setStatus] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!name.trim()) {
-            alert("Please enter a name!");
+            setStatus("Please enter a name.");
             return;
         }
 
+        setLoading(true);
+        setStatus("");
+
         try {
-            const response = await fetch("https://rfid.shivamrajdubey.tech/api/stock", {
+            const response = await fetch("https://rfid.shivamrajdubey.tech/api/stock", {//http://localhost:5010/api/stock
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -23,21 +28,25 @@ const AddItemForm = () => {
 
             const contentType = response.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {
-                throw new Error("Server returned non-JSON response (possible HTML error)");
+                throw new Error("Non-JSON response from server");
             }
 
             const data = await response.json();
             console.log("Response:", data);
 
-            alert(`✅ Data received: ${JSON.stringify(data)}`);
+            setStatus("✅ Successfully sent: " + data.status);
+            setName("");
+            onDataUpdated(); // Trigger reload
         } catch (error) {
             console.error("❌ Error:", error);
-            alert("Failed to send data. Check API URL or Server Logs.");
+            setStatus("❌ Failed to send. Check API or server logs.");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <div className="form-container">
             <h2>Add Name</h2>
             <form onSubmit={handleSubmit}>
                 <input
@@ -45,29 +54,12 @@ const AddItemForm = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Enter Name"
-                    style={{
-                        padding: "8px",
-                        fontSize: "16px",
-                        borderRadius: "4px",
-                        border: "1px solid #ccc",
-                        marginRight: "10px",
-                    }}
                 />
-                <button
-                    type="submit"
-                    style={{
-                        padding: "8px 15px",
-                        fontSize: "16px",
-                        borderRadius: "4px",
-                        border: "none",
-                        backgroundColor: "blue",
-                        color: "white",
-                        cursor: "pointer",
-                    }}
-                >
-                    Add
+                <button type="submit" disabled={loading}>
+                    {loading ? "Processing..." : "Add"}
                 </button>
             </form>
+            {status && <div className="form-status">{status}</div>}
         </div>
     );
 };
